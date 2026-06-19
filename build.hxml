@@ -1,0 +1,5 @@
+-main Main
+-cp source
+--macro InitMacros.main()
+--cpp bin
+-cmd ./bin/Main
