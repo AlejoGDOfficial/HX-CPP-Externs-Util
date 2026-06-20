@@ -1,27 +1,10 @@
-package util;
+package ale.cpp.macros;
 
 import haxe.macro.TypeTools;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 
-typedef TypeConfigFieldArgument = {
-    name:String,
-    type:String
-}
-
-typedef TypeConfigField = {
-    name:String,
-    arguments:Array<TypeConfigFieldArgument>,
-    ?returnType:String
-}
-
-typedef TypeConfig = {
-    name:String,
-    file:String,
-    fields:Array<TypeConfigField>
-}
-
-class CPPExternMacro
+class ExternsGeneratorMacro
 {
     public static var PATH:String = '';
 
@@ -68,9 +51,12 @@ class CPPExternMacro
                                 args: [
                                     for (arg in field.arguments)
                                     {
+                                        arg.optional ??= false;
+
                                         {
                                             name: arg.name,
-                                            type: TypeTools.toComplexType(Context.getType(arg.type))
+                                            type: TypeTools.toComplexType(Context.getType(arg.type)),
+                                            opt: arg.optional
                                         }
                                     }
                                 ],

@@ -1,0 +1,17 @@
+{
+    "name": "ale-cpp-externs-generator",
+    "url": "https://github.com/AlejoGDOfficial/ALE-CPP-Externs-Generator",
+    "license": "MIT",
+    "tags": [
+        "ale",
+        "cpp",
+        "externs"
+    ],
+    "description": "A small utility for creating C++ externs in Haxe",
+    "version": "1.0.0",
+    "classPath": "source/",
+    "releasenote": "",
+    "contributors": [
+        "AlejoGDOfficial"
+    ]
+}
