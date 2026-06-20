@@ -10,7 +10,7 @@
                     "arguments": [
                         {
                             "name": "text",
-                            "type": "String"
+                            "type": "cpp.ConstCharStar"
                         }
                     ]
                 }
