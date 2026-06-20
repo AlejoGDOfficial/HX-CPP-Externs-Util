@@ -1,3 +1,3 @@
 #include <string>
 
-void example(const char *text);
+float example(float a, int b);

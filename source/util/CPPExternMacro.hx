@@ -11,7 +11,8 @@ typedef TypeConfigFieldArgument = {
 
 typedef TypeConfigField = {
     name:String,
-    arguments:Array<TypeConfigFieldArgument>
+    arguments:Array<TypeConfigFieldArgument>,
+    ?returnType:String
 }
 
 typedef TypeConfig = {
@@ -33,37 +34,12 @@ class CPPExternMacro
 
             final path:String = PATH + type.file + '.cpp';
 
-            final fields:Array<Field> = [
-                for (field in type.fields)
-                {
-                    {
-                        name: field.name,
-                        access: [APublic, AStatic],
-                        meta: [{
-                            name: ':native',
-                            params: [ macro 'example' ],
-                            pos: Context.currentPos()
-                        }],
-                        kind: FFun({
-                            args: [
-                                for (arg in field.arguments)
-                                {
-                                    {
-                                        name: arg.name,
-                                        type: TypeTools.toComplexType(Context.getType(arg.type))
-                                    }
-                                }
-                            ],
-                            ret: macro : Void
-                        }),
-                        pos: Context.currentPos()
-                    }
-                }
-            ];
+            final clsPack:Array<String> = type.name.split('.');
+            final clsName:String = clsPack.pop();
 
             Context.defineType({
-                pack: [],
-                name: type.name,
+                name: clsName,
+                pack: clsPack,
                 kind: TDClass(null, null, false),
                 meta: [
                     {
@@ -75,7 +51,35 @@ class CPPExternMacro
                     }
                 ],
                 isExtern: true,
-                fields: fields,
+                fields: [
+                    for (field in type.fields)
+                    {
+                        field.returnType ??= 'Void';
+
+                        {
+                            name: field.name,
+                            access: [APublic, AStatic],
+                            meta: [{
+                                name: ':native',
+                                params: [ macro 'example' ],
+                                pos: Context.currentPos()
+                            }],
+                            kind: FFun({
+                                args: [
+                                    for (arg in field.arguments)
+                                    {
+                                        {
+                                            name: arg.name,
+                                            type: TypeTools.toComplexType(Context.getType(arg.type))
+                                        }
+                                    }
+                                ],
+                                ret: TypeTools.toComplexType(Context.getType(field.returnType))
+                            }),
+                            pos: Context.currentPos()
+                        }
+                    }
+                ],
                 pos: Context.currentPos()
             });
         }

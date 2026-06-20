@@ -9,10 +9,15 @@
                     "name": "example",
                     "arguments": [
                         {
-                            "name": "text",
-                            "type": "cpp.ConstCharStar"
+                            "name": "a",
+                            "type": "Float"
+                        },
+                        {
+                            "name": "b",
+                            "type": "Int"
                         }
-                    ]
+                    ],
+                    "returnType": "Float"
                 }
             ]
         }

@@ -4,6 +4,6 @@ class Main
 {
     static function main()
     {
-        Extern.example('tung');
+        trace(Extern.example(10.5, 10));
     }
 }

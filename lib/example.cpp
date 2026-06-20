@@ -1,7 +1,7 @@
 #include "example.h"
 #include <iostream>
 
-void example(const char* text)
+float example(float a, int b)
 {
-    std::cout << text << std::endl;
+    return a + b;
 }
