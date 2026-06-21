@@ -4,5 +4,7 @@ typedef TypeConfig = {
     name:String,
     file:String,
     ?functions:Array<TypeConfigFunction>,
-    ?variables:Array<TypeConfigVariable>
+    ?variables:Array<TypeConfigVariable>,
+    ?include:String,
+    ?xml:String
 }

@@ -6,7 +6,7 @@ import haxe.macro.Expr;
 
 class ExternsGeneratorMacro
 {
-    public static var PATH:String = '';
+    public static var PATH:Null<String> = '';
 
     static function resolveType(type:TypeConfigType):ComplexType
     {
@@ -34,22 +34,33 @@ class ExternsGeneratorMacro
             if (type == null)
                 continue;
 
-            final path:String = PATH + type.file + '.cpp';
+            final path:String = (PATH ?? '') + type.file + '.cpp';
 
             final clsPack:Array<String> = type.name.split('.');
             final clsName:String = clsPack.pop();
+
+            final meta:Array<MetadataEntry> = [{
+                name: ':include',
+                params: [
+                    macro $v{type.include ?? path},
+                ],
+                pos: Context.currentPos()
+            }];
+
+            if (type.xml != null)
+                meta.push({
+                    name: ':buildXml',
+                    params: [
+                        macro $(type.xml)
+                    ],
+                    pos: Context.currentPos()
+                });
 
             Context.defineType({
                 name: clsName,
                 pack: clsPack,
                 kind: TDClass(null, null, false),
-                meta: [{
-                    name: ':include',
-                    params: [
-                        macro $v{path},
-                    ],
-                    pos: Context.currentPos()
-                }],
+                meta: meta,
                 isExtern: true,
                 fields: [
                     for (func in type.functions)
