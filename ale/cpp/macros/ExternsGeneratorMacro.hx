@@ -51,7 +51,7 @@ class ExternsGeneratorMacro
                 meta.push({
                     name: ':buildXml',
                     params: [
-                        macro $(type.xml)
+                        macro $v{type.xml}
                     ],
                     pos: Context.currentPos()
                 });
