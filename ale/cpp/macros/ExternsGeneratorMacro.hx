@@ -36,7 +36,7 @@ class ExternsGeneratorMacro
 
             final path:String = (PATH ?? '') + type.file + '.cpp';
 
-            final clsPack:Array<String> = type.name.split('.');
+            final clsPack:Array<String> = type.path.split('.');
             final clsName:String = clsPack.pop();
 
             final meta:Array<MetadataEntry> = [{
@@ -47,6 +47,15 @@ class ExternsGeneratorMacro
                 pos: Context.currentPos()
             }];
 
+            if (type.native != null)
+                meta.push({
+                    name: ':native',
+                    params: [
+                        macro $v{type.native}
+                    ],
+                    pos: Context.currentPos()
+                });
+
             if (type.xml != null)
                 meta.push({
                     name: ':buildXml',
@@ -56,59 +65,63 @@ class ExternsGeneratorMacro
                     pos: Context.currentPos()
                 });
 
+            final fields:Array<Field> = [];
+
+            if (type.functions != null)
+                for (func in type.functions)
+                    fields.push({
+                        name: func.name,
+                        access: [APublic, AStatic],
+                        meta: [{
+                            name: ':native',
+                            params: [ macro $v{func.native ?? func.name} ],
+                            pos: Context.currentPos()
+                        }],
+                        kind: FFun({
+                            args: [
+                                for (arg in func.arguments ?? [])
+                                {
+                                    arg.optional ??= false;
+
+                                    {
+                                        name: arg.name,
+                                        type: resolveType(arg.type ?? {
+                                            path: 'Dynamic' 
+                                        }),
+                                        opt: arg.optional
+                                    }
+                                }
+                            ],
+                            ret: resolveType(func.type ?? {
+                                path: 'Void'
+                            })
+                        }),
+                        pos: Context.currentPos()
+                    });
+
+            if (type.variables != null)
+                for (vari in type.variables)
+                    fields.push({
+                        name: vari.name,
+                        access: [APublic, AStatic],
+                        meta: [{
+                            name: ':native',
+                            params: [ macro $v{vari.native ?? vari.name} ],
+                            pos: Context.currentPos()
+                        }],
+                        kind: FVar(resolveType(vari.type ?? {
+                            path: 'Dynamic'
+                        })),
+                        pos: Context.currentPos()
+                    });
+
             Context.defineType({
                 name: clsName,
                 pack: clsPack,
                 kind: TDClass(null, null, false),
                 meta: meta,
                 isExtern: true,
-                fields: [
-                    for (func in type.functions ?? [])
-                        {
-                            name: func.name,
-                            access: [APublic, AStatic],
-                            meta: [{
-                                name: ':native',
-                                params: [ macro $v{func.native ?? func.name} ],
-                                pos: Context.currentPos()
-                            }],
-                            kind: FFun({
-                                args: [
-                                    for (arg in func.arguments ?? [])
-                                    {
-                                        arg.optional ??= false;
-
-                                        {
-                                            name: arg.name,
-                                            type: resolveType(arg.type ?? {
-                                                path: 'Dynamic' 
-                                            }),
-                                            opt: arg.optional
-                                        }
-                                    }
-                                ],
-                                ret: resolveType(func.type ?? {
-                                    path: 'Void'
-                                })
-                            }),
-                            pos: Context.currentPos()
-                        }
-                ].concat([
-                    for (vari in type.variables)
-                        {
-                            name: vari.name,
-                            access: [APublic, AStatic],
-                            meta: [{
-                                name: ':native',
-                                params: [ macro $v{vari.native ?? vari.name} ],
-                                pos: Context.currentPos()
-                            }],
-                            kind: FVar(resolveType(vari.type ?? {
-                                path: 'Dynamic'
-                            })),
-                            pos: Context.currentPos()
-                        }
-                ]),
+                fields: fields,
                 pos: Context.currentPos()
             });
         }
